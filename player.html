@@ -15,48 +15,54 @@
     </div>
 </header>
 
-<main class="content">
+<main class="content player-page">
 
 <section class="panel player-panel">
 
-    <div class="video-wrapper">
-        <div class="episode-header">
-            <div class="title-controls">
-                <button id="prevButton" class="nav-button">← Previous</button>
-                <div class="title-column">
-                    <h3 id="seriesTitle" class="series-title-clickable">Loading...</h3>
-                    <h2 id="episodeTitle" class="episode-title-clickable">Loading...</h2>
-                </div>
-                <button id="nextButton" class="nav-button">Next →</button>
-            </div>
-            
-            <div class="header-info">
-                <span id="episodeCounter"></span>
-                
-                <div class="language-switcher">
-                    <label>Language:</label>
-                    <select id="languageSelect">
-                        <option value="jp">Japanese</option>
-                        <option value="en">English</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+    <aside class="player-sidebar">
+        <a id="seriesPosterLink" class="player-poster-wrap" href="#">
+            <img id="seriesPoster" src="" alt="">
+        </a>
+        <button type="button" id="seriesTitleBtn" class="series-name-btn">Loading...</button>
+        <div id="videoList" class="player-episode-list"></div>
+    </aside>
 
-        <iframe id="videoPlayer" width="100%" height="500" style="border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        <video id="videoPlayerDirect" width="100%" height="500" style="display:none;background:#000" controls playsinline></video>
+    <div class="player-main">
+        <div class="video-wrapper">
+            <div class="episode-header">
+                <div class="title-controls">
+                    <button id="prevButton" class="nav-button">← Previous</button>
+                    <div class="title-column">
+                        <h2 id="episodeTitle" class="episode-title-clickable">Loading...</h2>
+                    </div>
+                    <button id="nextButton" class="nav-button">Next →</button>
+                </div>
 
-        <div id="playerFallback" style="display:none;margin-top:10px">
-            <span>Unable to load video.</span>
-            <a id="externalLink" href="#" target="_blank">Open on Google Drive</a>
+                <div class="header-info">
+                    <span id="episodeCounter"></span>
+                </div>
+            </div>
+
+            <div class="player-video-stage">
+                <iframe id="videoPlayer" class="player-video" style="border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <video id="videoPlayerDirect" class="player-video" style="display:none;background:#000" controls playsinline></video>
+
+                <div id="playerFallback" style="display:none">
+                    <span>Unable to load video.</span>
+                    <a id="externalLink" href="#" target="_blank">Open on Google Drive</a>
+                </div>
+            </div>
+
+            <div class="language-switcher">
+                <label for="languageSelect">Language:</label>
+                <select id="languageSelect">
+                    <option value="jp">Japanese</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
         </div>
     </div>
 
-</section>
-
-<section class="panel">
-    <h3>Episodes</h3>
-    <div id="videoList" class="episode-grid"></div>
 </section>
 
 </main>
@@ -101,9 +107,18 @@ let currentLanguage = "jp";
 ========================= */
 const player = document.getElementById("videoPlayer");
 const playerDirect = document.getElementById("videoPlayerDirect");
-const seriesTitleEl = document.getElementById("seriesTitle");
+const seriesPosterLink = document.getElementById("seriesPosterLink");
+const seriesPosterEl = document.getElementById("seriesPoster");
+const seriesTitleBtn = document.getElementById("seriesTitleBtn");
 const episodeTitleEl = document.getElementById("episodeTitle");
 const listEl = document.getElementById("videoList");
+
+const displayName = series.subtitle || series.title;
+const seasonPageUrl = `${series.seasonPage}?id=${series.id}`;
+seriesPosterLink.href = seasonPageUrl;
+seriesPosterEl.src = series.cover || "";
+seriesPosterEl.alt = displayName;
+seriesTitleBtn.textContent = displayName;
 const externalLink = document.getElementById("externalLink");
 const fallback = document.getElementById("playerFallback");
 const languageSelect = document.getElementById("languageSelect");
@@ -141,7 +156,6 @@ function loadEpisode(index, autoplay = true) {
 
     if (!ep) return;
 
-    seriesTitleEl.textContent = series.subtitle || series.title;
     episodeTitleEl.textContent = ep;
 
     const iframeUrl = buildIframeUrl(index);
@@ -256,8 +270,8 @@ document.getElementById("nextButton").addEventListener("click", () => {
 /* =========================
    CLICKABLE TITLE
 ========================= */
-seriesTitleEl.addEventListener("click", () => {
-    window.location.href = `season1.html?id=${series.id}`;
+seriesTitleBtn.addEventListener("click", () => {
+    window.location.href = seasonPageUrl;
 });
 
 /* =========================
@@ -328,6 +342,17 @@ if (episodes.length > 0) {
             ? await AniList.fetchById(series.anilistId)
             : await AniList.fetchByTitle(series.anilistTitle || series.title);
         if (!data) return;
+
+        if (data.coverImage?.large) {
+            seriesPosterEl.src = data.coverImage.large;
+        }
+
+        const enrichedTitle =
+            data.title?.english ||
+            data.title?.romaji ||
+            displayName;
+        seriesTitleBtn.textContent = enrichedTitle;
+        seriesPosterEl.alt = enrichedTitle;
 
         if (data.siteUrl) {
             const a = document.createElement("a");

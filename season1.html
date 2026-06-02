@@ -15,10 +15,9 @@
     </div>
 </header>
 
-<main class="content">
+<main class="season-page">
 
-    <!-- HERO -->
-    <section class="anime-hero">
+    <section class="anime-hero anime-hero-full">
         <div class="anime-backdrop">
             <img id="animeBanner" src="" alt="banner">
         </div>
@@ -47,11 +46,19 @@
         </div>
     </section>
 
-    <!-- EPISODES -->
-    <section class="panel">
-        <h3>Episodes</h3>
-        <div id="episodeList" class="episode-grid"></div>
-    </section>
+    <div class="content season-content">
+        <div class="season-body">
+            <section class="panel season-episodes-panel">
+                <h3>Episodes</h3>
+                <div id="episodeList" class="episode-grid season-episode-grid"></div>
+            </section>
+
+            <aside class="panel season-related-panel">
+                <h3>Related Series</h3>
+                <div id="relatedSeriesList" class="related-series-list"></div>
+            </aside>
+        </div>
+    </div>
 
 </main>
 
@@ -80,12 +87,19 @@ const genresEl = document.getElementById("animeGenres");
 const descEl = document.getElementById("animeDescription");
 const playerLink = document.getElementById("playerLink");
 const episodeList = document.getElementById("episodeList");
+const relatedSeriesList = document.getElementById("relatedSeriesList");
 
 /* =========================
    BASE DATA (LOCAL FIRST)
 ========================= */
 titleEl.textContent = series.title;
 playerLink.href = `${series.playerPage}?id=${series.id}`;
+
+if (series.cover) {
+    coverEl.src = series.cover;
+    bannerEl.src = series.cover;
+    bannerEl.alt = `${series.subtitle || series.title} banner`;
+}
 
 /* =========================
    EPISODES (LOCAL CONTROL)
@@ -112,6 +126,51 @@ episodeList.innerHTML = series.season.episodes.map((ep, i) => `
 
     window.location.href = `${series.playerPage}?id=${series.id}#ep=${idx}`;
 });
+
+/* =========================
+   RELATED SERIES
+========================= */
+function renderRelatedSeries() {
+    const related = getRelatedSeries(series.id);
+
+    if (!related.length) {
+        relatedSeriesList.innerHTML = `<p class="related-series-empty">No related series yet.</p>`;
+        return;
+    }
+
+    relatedSeriesList.innerHTML = related.map(s => `
+        <a class="related-series-card" data-series-id="${s.id}" href="${s.seasonPage}?id=${s.id}">
+            <img src="${s.cover}" alt="${s.subtitle || s.title}">
+            <div class="related-series-info">
+                <strong>${s.subtitle || s.title}</strong>
+                <span>${s.season.title} · ${s.season.episodeCount} eps</span>
+                <span class="related-series-year">${s.year || ""}</span>
+            </div>
+        </a>
+    `).join("");
+}
+
+async function enrichRelatedSeriesCovers() {
+    const related = getRelatedSeries(series.id);
+    for (const s of related) {
+        try {
+            const data = s.anilistId
+                ? await AniList.fetchById(s.anilistId)
+                : await AniList.fetchByTitle(s.anilistTitle || s.title);
+            if (!data?.coverImage?.large) continue;
+
+            const img = relatedSeriesList.querySelector(
+                `.related-series-card[data-series-id="${s.id}"] img`
+            );
+            if (img) img.src = data.coverImage.large;
+        } catch (err) {
+            console.warn("Related AniList cover failed:", s.id, err);
+        }
+    }
+}
+
+renderRelatedSeries();
+enrichRelatedSeriesCovers();
 
 /* =========================
    ANILIST ENRICHMENT

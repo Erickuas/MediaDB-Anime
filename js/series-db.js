@@ -111,7 +111,7 @@ seriesDatabase.push({
         // Google Drive video IDs for each episode
         videoIds: {
             jp: [
-                '',
+                '1WPdZnhbQpDcZQiMPiyo2LMFHeaIeqMax',
                 '',
                 '',
                 '',
@@ -161,10 +161,234 @@ seriesDatabase.push({
     anilistTitle: 'Yofukashi no Uta Season 2'
 });
 
+seriesDatabase.push({
+    id: 'eminence-in-shadow',
+    title: 'Kage no Jitsuryokusha ni Naritakute!',
+    subtitle: 'The Eminence in Shadow',
+    year: '2022',
+    cover: 'images/eminence-in-shadow.svg',
+    description: 'A boy who has spent his life acting out fantasy scenarios in his head is reborn into a world of magic—and decides to become the power behind the throne as the mysterious figure known only as Shadow.',
+    season: {
+        title: 'Season 1',
+        episodeCount: 20,
+        episodes: [
+            'The Mysterious Fantasy World Crossover',
+            'Establishing an Identity for the Secret Organization',
+            'Cats, Villains, and the Greedy Fox',
+            'When the Going Gets Tough...',
+            'Shadow the Magnificent, Mary the Wonderful',
+            'Once You\'ve Ruled Out the Impossible...',
+            'The Feast Begins!',
+            'The False Bride Sneaks In!',
+            'The Garden of Red Roses Will Bloom at Night',
+            'Exploding! Hyper-Ultra Ultimate Growth!!!',
+            'The Enemy Was Called \'Terror\'',
+            'The Goddess of Rebellion and the Demon Beasts',
+            'A Bloody Battle, Just for You',
+            'You Who Serve and I Who Rule',
+            'The Cuirassier Rides Forth',
+            'And Yet, It Was Beautiful',
+            'The Nightmare Rises',
+            'Darkness Does Thy Bidding',
+            'Betrayal\'s Blade Moans at Twilight',
+            'The Shadows Rally in Twilight'
+        ],
+        videoIds: {
+            jp: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+            en: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        }
+    },
+    playerPage: 'player.html',
+    seasonPage: 'season1.html',
+    anilistTitle: 'Kage no Jitsuryokusha ni Naritakute!'
+});
+
+seriesDatabase.push({
+    id: 'eminence-in-shadow-s02',
+    title: 'Kage no Jitsuryokusha ni Naritakute!',
+    subtitle: 'The Eminence in Shadow',
+    year: '2023',
+    cover: 'images/eminence-in-shadow-s2.svg',
+    description: 'Shadow and his organization face new enemies as the secrets of the world—and his own legend—grow ever larger.',
+    season: {
+        title: 'Season 2',
+        episodeCount: 12,
+        episodes: [
+            'A Spotlight, However Brief, Is Still Meaningful',
+            'The Mad Dog Rages',
+            'Betrayal Has Many Faces',
+            'An Ecstatic Moment of Love and Grave Remembrance',
+            'They Are Humiliation and Conviction, Resentment and Despair...',
+            'Before the Battle, the Magical Girl Always Stands at the Ready and Waits',
+            'The End of a Myth',
+            'What Is Inherited, and What Should Be Left Behind',
+            'Gotta Go Fast, Serious Mode',
+            'The Battle of Morning Star',
+            'The Greatest of All Time',
+            'The Eminence in Shadow'
+        ],
+        videoIds: {
+            jp: ['', '', '', '', '', '', '', '', '', '', '', ''],
+            en: ['', '', '', '', '', '', '', '', '', '', '', '']
+        }
+    },
+    playerPage: 'player.html',
+    seasonPage: 'season1.html',
+    anilistTitle: 'Kage no Jitsuryokusha ni Naritakute! 2nd Season'
+});
+
+seriesDatabase.push({
+    id: 'my-dress-up-darling',
+    title: 'Sono Bisque Doll wa Koi wo Suru',
+    subtitle: 'My Dress-Up Darling',
+    year: '2022',
+    cover: 'images/my-dress-up-darling.svg',
+    description: 'Shy hina doll craftsman Wakana Gojo teams up with outgoing classmate Marin Kitagawa, who loves cosplay—and slowly draws him out of his shell.',
+    season: {
+        title: 'Season 1',
+        episodeCount: 12,
+        episodes: [
+            'Someone Who Lives in the Exact Opposite World as Me',
+            'Wanna Hurry Up, and Do It?',
+            'Then Why Don\'t We?',
+            'Are These Your Girlfriend\'s?',
+            'It\'s Probably Because This Is the Best Boob Bag Here',
+            'For Real?!',
+            'A Home Date with the Guy I Wuv Is the Best',
+            'Backlighting Is the Best',
+            'A Lot Happened After I Saw That Photo',
+            'We\'ve All Got Struggles',
+            'I Am Currently at a Love Hotel',
+            'My Dress-Up Darling'
+        ],
+        videoIds: {
+            jp: Array(12).fill(''),
+            en: Array(12).fill('')
+        }
+    },
+    playerPage: 'player.html',
+    seasonPage: 'season1.html',
+    anilistTitle: 'Sono Bisque Doll wa Koi wo Suru'
+});
+
+seriesDatabase.push({
+    id: 'my-dress-up-darling-s02',
+    title: 'Sono Bisque Doll wa Koi wo Suru',
+    subtitle: 'My Dress-Up Darling',
+    year: '2025',
+    cover: 'images/my-dress-up-darling-s2.svg',
+    description: 'Marin and Gojo dive into new cosplays, friendships, and feelings as their partnership—and romance—deepens.',
+    season: {
+        title: 'Season 2',
+        episodeCount: 12,
+        episodes: [
+            'Wakana Gojo, 15 Years Old, Teenager',
+            'You Can Equip Boobs',
+            'I Wuuuuv Slice-of-Life Scenes!',
+            'Has All My Measurements Memorized',
+            '800 Million',
+            'I\'ll Make It Happen, No Matter What with These Two Hands',
+            'Capture Those Delicious Memories!',
+            'The Only Way I Can Think of to Express That Gratitude Is with Money',
+            'Because I Don\'t Intend to Sleep Tonight',
+            'So We\'re Gonna Do It All Right Now?!',
+            'I Didn\'t Think Anything Good Would Ever Happen to Me',
+            'Dear My Dress-Up Darling'
+        ],
+        videoIds: {
+            jp: Array(12).fill(''),
+            en: Array(12).fill('')
+        }
+    },
+    playerPage: 'player.html',
+    seasonPage: 'season1.html',
+    anilistTitle: 'Sono Bisque Doll wa Koi wo Suru Season 2'
+});
+
+seriesDatabase.push({
+    id: 'tokyo-mew-mew',
+    title: 'Tokyo Mew Mew',
+    subtitle: 'Tokyo Mew Mew',
+    year: '2002',
+    cover: 'images/tokyo-mew-mew.svg',
+    description: 'Five ordinary girls gain the power of endangered animals to fight aliens as the magical team Tokyo Mew Mew.',
+    season: {
+        title: 'Season 1',
+        episodeCount: 52,
+        episodes: Array.from({ length: 52 }, (_, i) => `Episode ${i + 1}`),
+        videoIds: {
+            jp: Array(52).fill(''),
+            en: Array(52).fill('')
+        }
+    },
+    playerPage: 'player.html',
+    seasonPage: 'season1.html',
+    anilistTitle: 'Tokyo Mew Mew'
+});
+
+seriesDatabase.push({
+    id: 'tokyo-mew-mew-new',
+    title: 'Tokyo Mew Mew New',
+    subtitle: 'Tokyo Mew Mew New',
+    year: '2022–2023',
+    cover: 'images/tokyo-mew-mew-new.svg',
+    description: 'Ichigo Momomiya and four other girls become magical defenders of Earth in this reboot—across two seasons of the beloved magical girl series.',
+    season: {
+        title: 'Season 1',
+        episodeCount: 24,
+        episodes: [
+            'Wait, What?! I\'m a Superhero Now?! Meow!',
+            'What Makes a Real Friend?',
+            'A Stolen Kiss?! Mew Pudding is Here!',
+            'Who Doesn\'t Want to Be Her? Our Last Member is a Huge Star!',
+            'Smile, Mint! A Fancy Lady, Forlorn',
+            'Hear My Voice! I Will Surpass Myself',
+            'Farewell Cherry Blossom',
+            'Believe In Yourself - Romance on the High Seas',
+            'Let Cupid\'s Arrow Fly! The Super Secret Date Scheme!',
+            'Cat Got My Tongue?! A Heart-Pounding Transformation!',
+            'Everyone\'s Waiting For You! Run, Ichigo!',
+            'Rain & Tears',
+            'Step Up! Ichigo\'s Romance Enters the Next Stage!',
+            'Mint, the Runaway?! I\'m Going to Change the World!',
+            'Hi Mom, It\'s Purin! I\'m Doing Great!',
+            'Droplets of Love',
+            'Music Video Madness. When Two Prodigies Clash!',
+            'His Hidden Resolve / The Birth of the Mew Project',
+            'My Future Starts Now: This is the Real Me',
+            'Kish and the Blue Knight',
+            'Deep Blue',
+            'Scattered Hearts and a Tearful Night',
+            'Hear Our Cry! The Final Battle!',
+            'The Future We Build Together'
+        ],
+        videoIds: {
+            jp: Array(24).fill(''),
+            en: Array(24).fill('')
+        }
+    },
+    playerPage: 'player.html',
+    seasonPage: 'season1.html',
+    anilistTitle: 'Tokyo Mew Mew New'
+});
+
 function getAllSeries() {
     return seriesDatabase;
 }
 
 function getSeriesById(id) {
     return seriesDatabase.find(series => series.id === id);
+}
+
+function getRelatedSeries(id) {
+    const current = getSeriesById(id);
+    if (!current) return [];
+    if (Array.isArray(current.relatedIds) && current.relatedIds.length) {
+        return current.relatedIds
+            .map(relatedId => getSeriesById(relatedId))
+            .filter(Boolean);
+    }
+    return seriesDatabase.filter(
+        s => s.id !== id && s.title === current.title
+    );
 }
