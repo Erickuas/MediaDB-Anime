@@ -23,7 +23,40 @@ const seriesDatabase = [
                 'Call of the Night S01E11',
                 'Call of the Night S01E12',
                 'Call of the Night S01E13'
-            ]
+            ],
+            // Google Drive video IDs for each episode
+            videoIds: {
+                jp: [
+                    '1KkeJqr86aGD2JN8JfVC80_HlEmHvKFTV',
+                    '1B1pHtoaWPXQkA-yNC7-fi4KgllM9zFZq',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
+                ],
+                en: [
+                    '1LYcE99xAYj6LQTKsBHdOXa-HrwKEpVn4',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
+                ]
+            }
             ,
             // actual filenames (without extension). English files have an extra " (1)" suffix.
             fileNames: [
@@ -75,6 +108,37 @@ seriesDatabase.push({
             'Call of the Night S02E11',
             'Call of the Night S02E12'
         ],
+        // Google Drive video IDs for each episode
+        videoIds: {
+            jp: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                ''
+            ],
+            en: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                ''
+            ]
+        },
         // actual filenames (without extension)
         fileNames: [
             '[DB]Yofukashi no Uta Season 2_-_01_(Dual Audio_10bit_BD1080p_x265)',
