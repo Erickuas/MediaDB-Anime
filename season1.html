@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Season Overview</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <a class="logo" href="index.html">Media DB</a>
+        <nav class="top-nav">
+            <a href="index.html">Library</a>
+            <a href="call-of-the-night.html">Player</a>
+        </nav>
+    </div>
+</header>
+
+<main class="content">
+
+    <!-- HERO -->
+    <section class="anime-hero">
+        <div class="anime-backdrop">
+            <img id="animeBanner" src="" alt="banner">
+        </div>
+
+        <div class="anime-hero-inner">
+
+            <div class="anime-poster">
+                <img id="animeCover" src="" alt="cover">
+            </div>
+
+            <div class="anime-info">
+                <h1 id="animeTitle">Loading...</h1>
+
+                <div class="anime-meta" id="animeMeta"></div>
+
+                <div class="anime-genres" id="animeGenres"></div>
+
+                <p id="animeDescription">Loading description...</p>
+
+                <div class="anime-actions">
+                    <a href="index.html">← Library</a>
+                    <a id="playerLink" href="#">▶ Watch</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- EPISODES -->
+    <section class="panel">
+        <h3>Episodes</h3>
+        <div id="episodeList" class="episode-grid"></div>
+    </section>
+
+</main>
+
+<script src="js/series-db.js"></script>
+<script src="js/anilist.js"></script>
+
+<script>
+function getSeriesId() {
+    const u = new URL(window.location.href);
+    return u.searchParams.get('id') || null;
+}
+
+const seriesId = getSeriesId() || 'call-of-the-night';
+const series = getSeriesById(seriesId);
+
+if (!series) throw new Error("Series not found: " + seriesId);
+
+/* =========================
+   ELEMENTS
+========================= */
+const coverEl = document.getElementById("animeCover");
+const bannerEl = document.getElementById("animeBanner");
+const titleEl = document.getElementById("animeTitle");
+const metaEl = document.getElementById("animeMeta");
+const genresEl = document.getElementById("animeGenres");
+const descEl = document.getElementById("animeDescription");
+const playerLink = document.getElementById("playerLink");
+const episodeList = document.getElementById("episodeList");
+
+/* =========================
+   BASE DATA (LOCAL FIRST)
+========================= */
+titleEl.textContent = series.title;
+playerLink.href = `${series.playerPage}?id=${series.id}`;
+
+/* =========================
+   EPISODES (LOCAL CONTROL)
+========================= */
+episodeList.innerHTML = series.season.episodes.map((ep, i) => `
+    <button class="episode-card" data-index="${i}">
+        ${ep}
+        <span class="ep-num">EP ${i + 1}</span>
+    </button>
+`).join('');
+
+/* EVENT DELEGATION (better than querySelectorAll loop) */
+    episodeList.addEventListener("click", (e) => {
+    const btn = e.target.closest(".episode-card");
+    if (!btn) return;
+
+    const idx = btn.dataset.index;
+
+    const recent = JSON.parse(localStorage.getItem("recentlyWatched") || "[]");
+    const filtered = recent.filter(r => r.id !== series.id);
+    
+    filtered.unshift({ id: series.id, ts: Date.now() });
+    localStorage.setItem("recentlyWatched", JSON.stringify(filtered.slice(0, 10)));
+
+    window.location.href = `${series.playerPage}?id=${series.id}#ep=${idx}`;
+});
+
+/* =========================
+   ANILIST ENRICHMENT
+========================= */
+(async () => {
+    try {
+        const data = series.anilistId
+            ? await AniList.fetchById(series.anilistId)
+            : await AniList.fetchByTitle(series.anilistTitle || series.title);
+        if (!data) return;
+
+        // COVER
+        if (data.coverImage?.large) {
+            coverEl.src = data.coverImage.large;
+        }
+
+        // BANNER
+        bannerEl.src = data.bannerImage || data.coverImage?.large || "";
+
+        // TITLE (smart fallback)
+        titleEl.textContent =
+            data.title?.english ||
+            data.title?.romaji ||
+            series.title;
+
+        // DESCRIPTION
+        if (data.description) {
+            descEl.innerHTML = AniList.cleanDescription(data.description);
+        }
+
+        // META (safe build)
+        const meta = [
+            data.season,
+            data.seasonYear,
+            data.episodes ? `${data.episodes} eps` : null,
+            data.averageScore ? `★ ${data.averageScore / 10}` : null
+        ].filter(Boolean);
+
+        metaEl.textContent = meta.join(" • ");
+
+        // GENRES (safe render)
+        if (Array.isArray(data.genres)) {
+            genresEl.innerHTML = data.genres
+                .map(g => `<span>${g}</span>`)
+                .join("");
+        }
+
+    } catch (err) {
+        console.warn("AniList fetch failed:", err);
+    }
+})();
+</script>
+
+</body>
+</html>

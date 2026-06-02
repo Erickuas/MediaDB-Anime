@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player - Media DB</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <a class="logo" href="index.html">Media DB</a>
+        <nav class="top-nav">
+            <a href="index.html">Library</a>
+            <a id="seasonLink" href="season1.html">Season overview</a>
+        </nav>
+    </div>
+</header>
+
+<main class="content">
+
+<section class="panel player-panel">
+
+    <h2 id="currentTitle">Loading...</h2>
+
+    <video id="videoPlayer" controls preload="metadata">
+        <source id="videoSource" src="" type="video/mp4">
+        Your browser does not support this format.
+    </video>
+
+    <div id="playerFallback" style="display:none;margin-top:10px">
+        <span>This video format may not be supported.</span>
+        <a id="externalLink" href="#" target="_blank">Open file externally</a>
+    </div>
+
+    <div class="language-switcher">
+        <label>Language</label>
+        <select id="episodeLanguageSelect"></select>
+    </div>
+
+    <div class="controls">
+        <button id="playButton">Play / Pause</button>
+        <button id="restartButton">Restart</button>
+    </div>
+
+</section>
+
+<section class="panel">
+    <h3>Episodes</h3>
+    <div id="videoList" class="episode-grid"></div>
+</section>
+
+</main>
+
+<script src="js/series-db.js"></script>
+<script src="js/anilist.js"></script>
+
+<script>
+/* =========================
+   SAFE ID HANDLING
+========================= */
+function getSeriesId() {
+    const url = new URL(window.location.href);
+    return url.searchParams.get("id");
+}
+
+const seriesId = getSeriesId();
+
+if (!seriesId) {
+    document.body.innerHTML = "<h1 style='padding:20px'>No series id provided</h1>";
+    throw new Error("Missing series id");
+}
+
+const series = getSeriesById(seriesId);
+
+if (!series) {
+    document.body.innerHTML = "<h1 style='padding:20px'>Series not found</h1>";
+    throw new Error("Series not found");
+}
+
+/* =========================
+   DATA
+========================= */
+const episodes = series?.season?.episodes || [];
+
+const languageOptions = [
+    { code: "jp", label: "JP" },
+    { code: "en", label: "EN" }
+];
+
+let activeIndex = 0;
+let currentLang = "jp";
+
+/* =========================
+   ELEMENTS
+========================= */
+const player = document.getElementById("videoPlayer");
+const source = document.getElementById("videoSource");
+const titleEl = document.getElementById("currentTitle");
+const listEl = document.getElementById("videoList");
+const langSelect = document.getElementById("episodeLanguageSelect");
+const externalLink = document.getElementById("externalLink");
+const fallback = document.getElementById("playerFallback");
+
+/* =========================
+   LANGUAGE UI
+========================= */
+function initLanguage() {
+    langSelect.innerHTML = languageOptions
+        .map(l => `<option value="${l.code}">${l.label}</option>`)
+        .join("");
+
+    langSelect.addEventListener("change", () => {
+        currentLang = langSelect.value;
+        loadEpisode(activeIndex, false);
+    });
+}
+
+/* =========================
+   SAFE PATH BUILDER
+========================= */
+function buildPath(index) {
+    const ep = episodes[index];
+    if (!ep) return "";
+
+    const folder = series.seasonFolder || "";
+
+    // Prefer explicit fileNames if provided in the DB (keeps display titles clean)
+    const fileBase = (series.season && series.season.fileNames && series.season.fileNames[index])
+        ? series.season.fileNames[index]
+        : ep;
+
+    const file = `${fileBase}${currentLang === 'en' ? ' (1).mkv' : '.mkv'}`;
+
+    // English files are stored in an "English" subfolder
+    const folderForLang = currentLang === 'en' && folder ? `${folder}/English` : folder;
+
+    return `${folderForLang}/${file}`;
+}
+
+/* =========================
+   LOAD EPISODE
+========================= */
+function loadEpisode(index, autoplay = true) {
+    activeIndex = index;
+
+    const ep = episodes[index];
+
+    if (!ep) return;
+
+    titleEl.textContent = ep;
+
+    const path = buildPath(index);
+
+    source.src = encodeURI(path);
+
+    // FIX: always use mp4 for browser safety
+    source.type = "video/mp4";
+
+    player.load();
+
+    externalLink.href = path;
+
+    // fallback only if browser refuses playback
+    const canPlay = player.canPlayType("video/mp4");
+
+    if (!canPlay) {
+        fallback.style.display = "block";
+    } else {
+        fallback.style.display = "none";
+        if (autoplay) player.play().catch(() => {});
+    }
+
+    updateUI();
+}
+
+/* =========================
+   RENDER EPISODES
+========================= */
+function renderEpisodes() {
+    listEl.innerHTML = episodes
+        .map((ep, i) => `
+            <button class="episode-card" data-index="${i}">
+                ${ep}
+                <span class="ep-num">EP ${i + 1}</span>
+            </button>
+        `)
+        .join("");
+
+    listEl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".episode-card");
+        if (!btn) return;
+
+        loadEpisode(Number(btn.dataset.index));
+        markWatched(series.id);
+    });
+}
+
+/* =========================
+   UI ACTIVE STATE
+========================= */
+function updateUI() {
+    document.querySelectorAll(".episode-card")
+        .forEach((el, i) => {
+            el.classList.toggle("active", i === activeIndex);
+        });
+}
+
+/* =========================
+   CONTROLS
+========================= */
+document.getElementById("playButton").onclick = () => {
+    player.paused ? player.play() : player.pause();
+};
+
+document.getElementById("restartButton").onclick = () => {
+    player.currentTime = 0;
+    player.play();
+};
+
+/* =========================
+   RECENT WATCHED
+========================= */
+function loadRecent() {
+    try {
+        return JSON.parse(localStorage.getItem("recentlyWatched")) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveRecent(data) {
+    localStorage.setItem("recentlyWatched", JSON.stringify(data));
+}
+
+function markWatched(id) {
+    const recent = loadRecent().filter(r => r.id !== id);
+    recent.unshift({ id, ts: Date.now() });
+    saveRecent(recent.slice(0, 10));
+}
+
+/* =========================
+   INIT
+========================= */
+initLanguage();
+renderEpisodes();
+// check hash for initial episode (e.g. #ep=2)
+function getEpisodeFromHash() {
+    const h = location.hash.replace('#', '');
+    if (!h) return null;
+    try {
+        const p = new URLSearchParams(h);
+        const ep = p.get('ep');
+        return ep !== null ? Number(ep) : null;
+    } catch {
+        return null;
+    }
+}
+
+const initialEp = getEpisodeFromHash();
+if (episodes.length > 0) {
+    if (initialEp !== null && Number.isFinite(initialEp) && initialEp >= 0 && initialEp < episodes.length) {
+        loadEpisode(initialEp, false);
+    } else {
+        loadEpisode(0, false);
+    }
+} else {
+    titleEl.textContent = "No episodes found";
+}
+
+/* =========================
+   OPTIONAL: ANI-LIST ENRICH
+========================= */
+(async () => {
+    try {
+        const data = series.anilistId
+            ? await AniList.fetchById(series.anilistId)
+            : await AniList.fetchByTitle(series.anilistTitle || series.title);
+        if (!data) return;
+
+        if (data.siteUrl) {
+            const a = document.createElement("a");
+            a.href = data.siteUrl;
+            a.target = "_blank";
+            a.textContent = "AniList page";
+            document.querySelector(".top-nav").appendChild(a);
+        }
+    } catch (e) {
+        console.warn("AniList failed", e);
+    }
+})();
+
+/* =========================
+   AUTO MARK ON PLAY
+========================= */
+player.addEventListener("play", () => {
+    markWatched(series.id);
+});
+</script>
+
+</body>
+</html>

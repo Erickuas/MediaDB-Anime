@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library - Media DB</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <a class="logo" href="index.html">Media DB</a>
+        <nav class="top-nav">
+            <a href="index.html">Library</a>
+            <a href="season1.html">Season overview</a>
+        </nav>
+    </div>
+</header>
+
+<main class="content">
+
+    <section class="panel">
+        <h2>Recently watched</h2>
+        <div id="recentGrid" class="series-grid"></div>
+    </section>
+
+    <section class="panel">
+        <h2>All series</h2>
+        <div id="seriesGrid" class="series-grid"></div>
+    </section>
+
+</main>
+
+<script src="js/series-db.js"></script>
+<script src="js/anilist.js"></script>
+
+<script>
+const seriesGrid = document.getElementById('seriesGrid');
+const recentGrid = document.getElementById('recentGrid');
+const seriesItems = getAllSeries();
+
+/* =========================
+   LOCAL STORAGE
+========================= */
+function loadRecentlyWatched() {
+    try {
+        return JSON.parse(localStorage.getItem('recentlyWatched')) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveRecentlyWatched(data) {
+    localStorage.setItem('recentlyWatched', JSON.stringify(data));
+}
+
+/* =========================
+   CARD HTML
+========================= */
+function seriesCardHTML(series) {
+    return `
+        <article class="series-card" data-id="${series.id}">
+            <div class="cover-image">
+                <img src="${series.cover}" alt="${series.title}">
+            </div>
+
+            <div class="series-card-content">
+                <h3>${series.title}</h3>
+                <p>${series.description}</p>
+
+                <div class="card-meta">
+                    <span>${series.season.title}</span>
+                    <span>${series.season.episodeCount} eps</span>
+                </div>
+
+                <div class="series-links">
+                    <a href="${series.seasonPage}?id=${series.id}">Season</a>
+                    <a class="watch-link" data-id="${series.id}" href="${series.playerPage}?id=${series.id}">
+                        Watch
+                    </a>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+/* =========================
+   RENDER LISTS
+========================= */
+function renderSeriesList() {
+    const recent = loadRecentlyWatched();
+    const byId = Object.fromEntries(seriesItems.map(s => [s.id, s]));
+
+    const recentSeries = recent.map(r => byId[r.id]).filter(Boolean);
+    const otherSeries = seriesItems.filter(s => !recent.find(r => r.id === s.id));
+
+    recentGrid.innerHTML = recentSeries.map(seriesCardHTML).join('');
+    seriesGrid.innerHTML = otherSeries.map(seriesCardHTML).join('');
+
+    attachWatchHandlers();
+}
+
+/* =========================
+   RECENT WATCHED SYSTEM
+========================= */
+function attachWatchHandlers() {
+    document.querySelectorAll('.watch-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const id = link.dataset.id;
+            const now = Date.now();
+
+            const recent = loadRecentlyWatched();
+
+            const updated = [
+                { id, ts: now },
+                ...recent.filter(r => r.id !== id)
+            ].slice(0, 10);
+
+            saveRecentlyWatched(updated);
+
+            // navigate after saving to avoid race conditions
+            const href = link.getAttribute('href') || `${link.dataset.player || 'player.html'}?id=${id}`;
+            window.location.href = href;
+        });
+    });
+}
+
+/* =========================
+   ANI-LIST ENRICHMENT
+========================= */
+(async function enrichSeries() {
+    for (const s of seriesItems) {
+        try {
+            const data = s.anilistId
+                ? await AniList.fetchById(s.anilistId)
+                : await AniList.fetchByTitle(s.anilistTitle || s.title);
+            if (!data) continue;
+
+            const card = document.querySelector(`.series-card[data-id="${s.id}"]`);
+            if (!card) continue;
+
+            const img = card.querySelector('img');
+            const desc = card.querySelector('.series-card-content p');
+
+            if (data.coverImage?.large) img.src = data.coverImage.large;
+            if (data.description) desc.textContent = AniList.cleanDescription(data.description);
+
+        } catch (err) {
+            console.warn('AniList enrich failed:', s.title, err);
+        }
+    }
+})();
+
+/* =========================
+   INIT
+========================= */
+renderSeriesList();
+</script>
+
+</body>
+</html>
